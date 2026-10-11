@@ -1,6 +1,7 @@
 #ifndef CORE_LIBS_PRX_LIBC_INCLUDE_GENERAL_HPP
 #define CORE_LIBS_PRX_LIBC_INCLUDE_GENERAL_HPP
 
+#include <cerrno>
 #include <stdexcept>
 #include <filesystem>
 #include <vector>
@@ -16,6 +17,17 @@ extern "C" bool StopAtPrefixLetter_nid_no_patch(const char* str, char** endptr, 
 extern "C" int KeepHostStandardError_nid_no_patch();
 extern "C" int HostStandardError_nid_no_patch();
 #endif
+
+template<typename TParse>
+auto ParseGuestInteger(const char* str, char** endptr, int base, TParse parse) {
+    using TValue = decltype(parse(str, endptr, base));
+    if (StopAtPrefixLetter_nid_no_patch(str, endptr, base)) return TValue{};
+    char* end = nullptr;
+    const TValue value = parse(str, &end, base);
+    if (end == str) errno = 22;
+    if (endptr != nullptr) *endptr = end;
+    return value;
+}
 
 extern "C" std::filesystem::path ResolvePath_nid_no_patch(const char* path);
 extern "C" std::filesystem::path RelinkedModulePath_nid_no_patch(const std::filesystem::path& path);
