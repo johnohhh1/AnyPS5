@@ -22,7 +22,7 @@ template<typename TParse>
 auto ParseGuestInteger(const char* str, char** endptr, int base, TParse parse) {
     using TValue = decltype(parse(str, endptr, base));
     if (StopAtPrefixLetter_nid_no_patch(str, endptr, base)) return TValue{};
-    char* end = nullptr;
+    char* end = const_cast<char*>(str);
     const TValue value = parse(str, &end, base);
     if (end == str) errno = 22;
     if (endptr != nullptr) *endptr = end;
