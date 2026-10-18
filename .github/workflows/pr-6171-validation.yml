@@ -1,0 +1,39 @@
+name: PR 6171 import-audit validation
+
+on:
+  push:
+    branches: [validation/import-audit-windows-20261018]
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    if: github.repository == 'johnohhh1/AnyPS5'
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            python: '3.12'
+          - os: windows-latest
+            python: '3.14'
+          - os: ubuntu-latest
+            python: '3.14'
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Full suite, before/after regressions and CLI cases
+        run: python validation/run_import_audit.py
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        if: always()
+        with:
+          name: audit-${{ matrix.os }}-python-${{ matrix.python }}
+          path: validation-results/
+          retention-days: 14
