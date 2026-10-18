@@ -1,0 +1,12 @@
+--- a/tools/import_audit.py
++++ b/tools/import_audit.py
+@@ -463,7 +463,8 @@
+                 identities[name].add(file)
+             for name in elf_exports(file, data):
+                 exports[name].add(file.name)
+-    requested = set(needed_names) | {name for _, needed in imports.values() for name in needed}
++    requested = {strip_origin(name) for name in needed_names}
++    requested |= {strip_origin(name) for _, needed in imports.values() for name in needed}
+     for name in sorted(requested):
+         if name in aliases:
+             continue

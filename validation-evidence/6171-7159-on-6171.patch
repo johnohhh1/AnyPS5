@@ -1,0 +1,69 @@
+diff --git a/tools/import_audit.py b/tools/import_audit.py
+index 4e3f54b2b..66c2cf00f 100644
+--- a/tools/import_audit.py
++++ b/tools/import_audit.py
+@@ -428,10 +428,11 @@ def module_files(directory):
+     for file in directory_files(directory, "*"):
+         with file.open("rb") as handle:
+             magic = handle.read(4)
+-        if magic == b"\x7fELF":
++        if magic == b"\x7fELF" or (magic.startswith(b"MZ") and file.name.endswith(".guest.prx")):
+             yield file
+         elif (file.suffix.lower() in (".prx", ".sprx", ".suprx", ".debug_prx", ".elf")
+-              or magic.startswith(b"MZ") or magic in (b"\x4f\x15\x3d\x1d", b"\x54\x14\xf5\xee")):
++              or magic.startswith(b"MZ")
++              or magic in (b"\x4f\x15\x3d\x1d", b"\x54\x14\xf5\xee")):
+             raise AuditError(f"{file}: expected ELF module (first bytes {magic!r})")
+ 
+ 
+@@ -452,17 +453,21 @@ def read_modules(directories, needed_names=()):
+                 continue
+             images[file.name] = (file, digest)
+             names = {"sonames": set(), "identities": set()}
+-            own = elf_imports(file, data, names)
+-            symbols, needed = own
+-            imports[file.name] = (sorted(symbols), sorted(needed))
++            if data.startswith(b"MZ"):
++                imports[file.name] = ([], [])
++                exported = pe_exports(file, data)
++            else:
++                symbols, needed = elf_imports(file, data, names)
++                imports[file.name] = (sorted(symbols), sorted(needed))
++                exported = elf_exports(file, data)
+             for name in {file.name} | names["sonames"]:
+                 if name in aliases and aliases[name] != file:
+                     raise AuditError(f"ambiguous guest module name {name}: {aliases[name]} and {file}")
+                 aliases[name] = file
+             for name in names["identities"]:
+                 identities[name].add(file)
+-            for name in elf_exports(file, data):
+-                exports[name].add(file.name)
++            for name in exported:
++                exports[name.split(MODULE_SUFFIX, 1)[0]].add(file.name)
+     requested = set(needed_names) | {name for _, needed in imports.values() for name in needed}
+     for name in sorted(requested):
+         if name in aliases:
+diff --git a/tools/tests/test_import_audit.py b/tools/tests/test_import_audit.py
+index 71229bd71..bac7f3bca 100644
+--- a/tools/tests/test_import_audit.py
++++ b/tools/tests/test_import_audit.py
+@@ -1488,6 +1488,19 @@ class ImportAuditTests(unittest.TestCase):
+         struct.pack_into("<qQ", image, dynamic + 16, 0, 0)
+         self.assertEqual(import_audit.elf_imports("module.prx", image)[1], {"libc.prx"})
+ 
++    def test_read_modules_uses_pe_exports_and_no_host_imports(self):
++        module = self.work.modules / "libc.prx.guest.prx"
++        module.write_bytes(build_pe(["sceKernelGettimeofday#guest", "sceKernelSleep"]))
++
++        imports, exports, modules = import_audit.read_modules([self.work.modules])
++
++        self.assertEqual(modules, {module.name})
++        self.assertEqual(imports, {module.name: ([], [])})
++        self.assertEqual(exports, {
++            "sceKernelGettimeofday": [module.name],
++            "sceKernelSleep": [module.name],
++        })
++
+     def test_pe32_uses_its_own_directory_layout(self):
+         image = bytearray(build_pe(["alpha"]))
+         struct.pack_into("<H", image, 0x58, 0x10b)

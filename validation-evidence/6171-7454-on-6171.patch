@@ -1,0 +1,81 @@
+diff --git a/tools/import_audit.py b/tools/import_audit.py
+index 4e3f54b2b..ec23a91d8 100644
+--- a/tools/import_audit.py
++++ b/tools/import_audit.py
+@@ -413,7 +413,7 @@ def audit_host_dependencies(direct, libraries, modules):
+         stack = [(name, [root, name]) for name in reversed(direct[root])]
+         while stack:
+             name, chain = stack.pop()
+-            if name not in available:
++            if strip_origin(name) not in available:
+                 missing.append({"importer": root, "chain": chain})
+             elif name in direct and name not in expanded and name not in chain[1:-1]:
+                 expanded.add(name)
+@@ -555,8 +555,18 @@ def check_conservation(references, records):
+         raise AuditError(f"conservation failed: {references} references in, {classified} classified, unknown classes {unknown}")
+ 
+ 
++def strip_origin(name):
++    """Strip the relinker's $ORIGIN/ prefix from a needed library name.
++
++    The relinker records converted modules' own dependencies as
++    `$ORIGIN/<file>` (GuestModuleBuilder), where `$ORIGIN` is the importing
++    module's directory. Matching must ignore that prefix.
++    """
++    return name[len("$ORIGIN/"):] if name.startswith("$ORIGIN/") else name
++
++
+ def classify(nid, library, providers, stubs, modules):
+-    if library and library in modules:
++    if library and strip_origin(library) in modules:
+         return "module"
+     if not providers:
+         return "absent"
+@@ -595,15 +605,15 @@ def audit(imports, exports, stubs, libraries, modules, module_imports=None, modu
+     check_conservation(len(imports) + sum(len(symbols) for symbols, _ in (module_imports or {}).values()), ordered)
+     missing = defaultdict(int)
+     for library in needed_libraries:
+-        if library not in libraries and library not in modules:
++        if library not in libraries and strip_origin(library) not in modules:
+             missing[library] = 0
+     for record in ordered:
+         library = record["library"]
+-        if library and library not in libraries and library not in modules:
++        if library and library not in libraries and strip_origin(library) not in modules:
+             missing[library] += 1
+     for _, needed in (module_imports or {}).values():
+         for library in needed:
+-            if library not in libraries and library not in modules:
++            if library not in libraries and strip_origin(library) not in modules:
+                 missing[library] += 1
+     return ordered, dict(sorted(missing.items()))
+ 
+diff --git a/tools/tests/test_import_audit.py b/tools/tests/test_import_audit.py
+index 71229bd71..d943b6427 100644
+--- a/tools/tests/test_import_audit.py
++++ b/tools/tests/test_import_audit.py
+@@ -804,6 +804,24 @@ class ImportAuditTests(unittest.TestCase):
+                         self.assertIn("invalid module name", err)
+                         self.assertEqual(result.read_bytes(), previous)
+ 
++    def test_converted_module_resolves_plain_and_origin_library_names(self):
++        work = self.work
++        (work.libs / "libc.prx").write_bytes(exporting())
++        (work.modules / "libSceFace.prx.guest.prx").write_bytes(exporting("AAAAAAAAAAA"))
++        (work.modules / "main.prx").write_bytes(build_elf([], ["$ORIGIN/libSceFace.prx.guest.prx"]))
++        registry = work.root / "game.registry.json"
++        write_registry(registry, [("AAAAAAAAAAA", "libSceFace.prx")])
++        (work.root / "game.needed.json").write_text('["libSceFace.prx"]')
++        result = work.root / "audit.json"
++        code, out, err = work.run(registry, "--json", str(result))
++        self.assertEqual((code, err), (0, ""))
++        data = json.loads(result.read_text())
++        self.assertEqual(data["missing_libraries"], {})
++        self.assertEqual(data["unique_by_class"]["module"], 1)
++        record = next(record for record in data["imports"] if record["nid"] == "AAAAAAAAAAA")
++        self.assertEqual((record["class"], record["library"]), ("module", "libSceFace.prx"))
++        self.assertNotIn("libSceFace.prx", out)
++
+     def test_conflicting_module_files_preserve_or_leave_no_json_report(self):
+         work = self.work
+         first, second = work.modules, work.root / "other-modules"

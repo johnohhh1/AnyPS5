@@ -1,0 +1,10 @@
+{"methods": 4, "failed_subcases": 0, "errors": 0, "skipped": 0}
+test_origin_dependency_resolves_declared_name (__main__.CrossIntegrationTests.test_origin_dependency_resolves_declared_name) ... ok
+test_origin_host_dependency_still_requires_filename (__main__.CrossIntegrationTests.test_origin_host_dependency_still_requires_filename) ... ok
+test_origin_identity_ambiguity_preserves_report (__main__.CrossIntegrationTests.test_origin_identity_ambiguity_preserves_report) ... ok
+test_pe_and_declared_elf_modules_resolve_together (__main__.CrossIntegrationTests.test_pe_and_declared_elf_modules_resolve_together) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.041s
+
+OK

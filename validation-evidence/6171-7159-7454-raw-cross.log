@@ -1,0 +1,192 @@
+{"methods": 4, "failed_subcases": 8, "errors": 0, "skipped": 0}
+test_origin_dependency_resolves_declared_name (__main__.CrossIntegrationTests.test_origin_dependency_resolves_declared_name) ... 
+  test_origin_dependency_resolves_declared_name (__main__.CrossIntegrationTests.test_origin_dependency_resolves_declared_name) (tag='0x6100000d', format='sections') ... FAIL
+  test_origin_dependency_resolves_declared_name (__main__.CrossIntegrationTests.test_origin_dependency_resolves_declared_name) (tag='0x6100000d', format='sysv') ... FAIL
+  test_origin_dependency_resolves_declared_name (__main__.CrossIntegrationTests.test_origin_dependency_resolves_declared_name) (tag='0x6100000d', format='gnu') ... FAIL
+  test_origin_dependency_resolves_declared_name (__main__.CrossIntegrationTests.test_origin_dependency_resolves_declared_name) (tag='0x61000043', format='sections') ... FAIL
+  test_origin_dependency_resolves_declared_name (__main__.CrossIntegrationTests.test_origin_dependency_resolves_declared_name) (tag='0x61000043', format='sysv') ... FAIL
+  test_origin_dependency_resolves_declared_name (__main__.CrossIntegrationTests.test_origin_dependency_resolves_declared_name) (tag='0x61000043', format='gnu') ... FAIL
+test_origin_host_dependency_still_requires_filename (__main__.CrossIntegrationTests.test_origin_host_dependency_still_requires_filename) ... ok
+test_origin_identity_ambiguity_preserves_report (__main__.CrossIntegrationTests.test_origin_identity_ambiguity_preserves_report) ... 
+  test_origin_identity_ambiguity_preserves_report (__main__.CrossIntegrationTests.test_origin_identity_ambiguity_preserves_report) (tag='0x6100000d') ... FAIL
+  test_origin_identity_ambiguity_preserves_report (__main__.CrossIntegrationTests.test_origin_identity_ambiguity_preserves_report) (tag='0x61000043') ... FAIL
+test_pe_and_declared_elf_modules_resolve_together (__main__.CrossIntegrationTests.test_pe_and_declared_elf_modules_resolve_together) ... ok
+
+======================================================================
+FAIL: test_origin_dependency_resolves_declared_name (__main__.CrossIntegrationTests.test_origin_dependency_resolves_declared_name) (tag='0x6100000d', format='sections')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/john/projects/anyps5-contributor-search-20261014/strengthen-20261018/cross-integration-tests.py", line 42, in test_origin_dependency_resolves_declared_name
+    self.assertEqual((code, err), (0, ''))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Tuples differ: (1, '') != (0, '')
+
+First differing element 0:
+1
+0
+
+- (1, '')
+?  ^
+
++ (0, '')
+?  ^
+
+
+======================================================================
+FAIL: test_origin_dependency_resolves_declared_name (__main__.CrossIntegrationTests.test_origin_dependency_resolves_declared_name) (tag='0x6100000d', format='sysv')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/john/projects/anyps5-contributor-search-20261014/strengthen-20261018/cross-integration-tests.py", line 42, in test_origin_dependency_resolves_declared_name
+    self.assertEqual((code, err), (0, ''))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Tuples differ: (1, '') != (0, '')
+
+First differing element 0:
+1
+0
+
+- (1, '')
+?  ^
+
++ (0, '')
+?  ^
+
+
+======================================================================
+FAIL: test_origin_dependency_resolves_declared_name (__main__.CrossIntegrationTests.test_origin_dependency_resolves_declared_name) (tag='0x6100000d', format='gnu')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/john/projects/anyps5-contributor-search-20261014/strengthen-20261018/cross-integration-tests.py", line 42, in test_origin_dependency_resolves_declared_name
+    self.assertEqual((code, err), (0, ''))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Tuples differ: (1, '') != (0, '')
+
+First differing element 0:
+1
+0
+
+- (1, '')
+?  ^
+
++ (0, '')
+?  ^
+
+
+======================================================================
+FAIL: test_origin_dependency_resolves_declared_name (__main__.CrossIntegrationTests.test_origin_dependency_resolves_declared_name) (tag='0x61000043', format='sections')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/john/projects/anyps5-contributor-search-20261014/strengthen-20261018/cross-integration-tests.py", line 42, in test_origin_dependency_resolves_declared_name
+    self.assertEqual((code, err), (0, ''))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Tuples differ: (1, '') != (0, '')
+
+First differing element 0:
+1
+0
+
+- (1, '')
+?  ^
+
++ (0, '')
+?  ^
+
+
+======================================================================
+FAIL: test_origin_dependency_resolves_declared_name (__main__.CrossIntegrationTests.test_origin_dependency_resolves_declared_name) (tag='0x61000043', format='sysv')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/john/projects/anyps5-contributor-search-20261014/strengthen-20261018/cross-integration-tests.py", line 42, in test_origin_dependency_resolves_declared_name
+    self.assertEqual((code, err), (0, ''))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Tuples differ: (1, '') != (0, '')
+
+First differing element 0:
+1
+0
+
+- (1, '')
+?  ^
+
++ (0, '')
+?  ^
+
+
+======================================================================
+FAIL: test_origin_dependency_resolves_declared_name (__main__.CrossIntegrationTests.test_origin_dependency_resolves_declared_name) (tag='0x61000043', format='gnu')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/john/projects/anyps5-contributor-search-20261014/strengthen-20261018/cross-integration-tests.py", line 42, in test_origin_dependency_resolves_declared_name
+    self.assertEqual((code, err), (0, ''))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Tuples differ: (1, '') != (0, '')
+
+First differing element 0:
+1
+0
+
+- (1, '')
+?  ^
+
++ (0, '')
+?  ^
+
+
+======================================================================
+FAIL: test_origin_identity_ambiguity_preserves_report (__main__.CrossIntegrationTests.test_origin_identity_ambiguity_preserves_report) (tag='0x6100000d')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/john/projects/anyps5-contributor-search-20261014/strengthen-20261018/cross-integration-tests.py", line 61, in test_origin_identity_ambiguity_preserves_report
+    self.assertEqual((code, out), (2, ''))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Tuples differ: (1, '0 references, 0 unique imports\n  imp[389 chars]s\n') != (2, '')
+
+First differing element 0:
+1
+2
+
++ (2, '')
+- (1,
+-  '0 references, 0 unique imports\n'
+-  '  implemented      0 imports       0 references\n'
+-  '  stub             0 imports       0 references\n'
+-  '  absent           0 imports       0 references\n'
+-  '  module           0 imports       0 references\n'
+-  '\n'
+-  'Current stop (first unresolved import, in registry order)\n'
+-  '  /tmp/tmphc4tkcke/game.registry.json: none\n'
+-  '\n'
+-  'Needed libraries with no file in --libs or --modules (1)\n'
+-  '  $ORIGIN/Declared.prx: 1 imports\n')
+
+======================================================================
+FAIL: test_origin_identity_ambiguity_preserves_report (__main__.CrossIntegrationTests.test_origin_identity_ambiguity_preserves_report) (tag='0x61000043')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/john/projects/anyps5-contributor-search-20261014/strengthen-20261018/cross-integration-tests.py", line 61, in test_origin_identity_ambiguity_preserves_report
+    self.assertEqual((code, out), (2, ''))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Tuples differ: (1, '0 references, 0 unique imports\n  imp[389 chars]s\n') != (2, '')
+
+First differing element 0:
+1
+2
+
++ (2, '')
+- (1,
+-  '0 references, 0 unique imports\n'
+-  '  implemented      0 imports       0 references\n'
+-  '  stub             0 imports       0 references\n'
+-  '  absent           0 imports       0 references\n'
+-  '  module           0 imports       0 references\n'
+-  '\n'
+-  'Current stop (first unresolved import, in registry order)\n'
+-  '  /tmp/tmphc4tkcke/game.registry.json: none\n'
+-  '\n'
+-  'Needed libraries with no file in --libs or --modules (1)\n'
+-  '  $ORIGIN/Declared.prx: 1 imports\n')
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.046s
+
+FAILED (failures=8)
