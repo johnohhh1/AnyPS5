@@ -1,0 +1,12 @@
+--- a/tools/import_audit.py
++++ b/tools/import_audit.py
+@@ -480,7 +480,8 @@
+                 identities[name].add(file)
+             for name in exported:
+                 exports[name.split(MODULE_SUFFIX, 1)[0]].add(file.name)
+-    requested = set(needed_names) | {name for _, needed in imports.values() for name in needed}
++    requested = {strip_origin(name) for name in needed_names}
++    requested |= {strip_origin(name) for _, needed in imports.values() for name in needed}
+     for name in sorted(requested):
+         if name in aliases:
+             continue
