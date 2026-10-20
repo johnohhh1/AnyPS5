@@ -1,0 +1,104 @@
+{
+  "pr_head": "98596149e2ce227c69ad1e625a1af957e63b1d7d",
+  "baseline": "892a4f1328a14a123eca4af8f3c9ea5d176133ab",
+  "workflow_commit": "aa423feee6a780d1b6f6a2fb81d9098fbf5fa480",
+  "python": "3.14.8 (main, Oct  1 2026, 02:38:33) [GCC 13.3.0]",
+  "platform": "Linux-7.0.0-1017-azure-x86_64-with-glibc2.39",
+  "os_name": "posix",
+  "suite": {
+    "tests": 127,
+    "passed": 126,
+    "failures": 0,
+    "errors": 0,
+    "skipped": [
+      {
+        "test": "test_read_only_json_report_stays_intact_without_a_read_only_temporary (tools.tests.test_import_audit.ImportAuditTests.test_read_only_json_report_stays_intact_without_a_read_only_temporary)",
+        "reason": "Windows read-only replacement behavior"
+      }
+    ],
+    "seconds": 1.1430726600000014
+  },
+  "baseline_regressions": {
+    "tests": 7,
+    "passed": null,
+    "failures": 83,
+    "errors": 0,
+    "skipped": [],
+    "seconds": 0.348301253999999
+  },
+  "cli": [
+    {
+      "case": "soname",
+      "exit_code": 0,
+      "expected_exit": 0,
+      "references": 1,
+      "missing_libraries": {},
+      "classes": {
+        "implemented": 0,
+        "stub": 0,
+        "absent": 0,
+        "module": 1
+      }
+    },
+    {
+      "case": "sce-sysv",
+      "exit_code": 0,
+      "expected_exit": 0,
+      "references": 1,
+      "missing_libraries": {},
+      "classes": {
+        "implemented": 0,
+        "stub": 0,
+        "absent": 0,
+        "module": 1
+      }
+    },
+    {
+      "case": "sce-gnu",
+      "exit_code": 0,
+      "expected_exit": 0,
+      "references": 1,
+      "missing_libraries": {},
+      "classes": {
+        "implemented": 0,
+        "stub": 0,
+        "absent": 0,
+        "module": 1
+      }
+    },
+    {
+      "case": "undeclared-case",
+      "exit_code": 1,
+      "expected_exit": 1,
+      "references": 1,
+      "missing_libraries": {
+        "different.prx": 1
+      },
+      "classes": {
+        "implemented": 0,
+        "stub": 0,
+        "absent": 1,
+        "module": 0
+      }
+    },
+    {
+      "case": "ambiguous",
+      "exit_code": 2,
+      "expected_exit": 2,
+      "previous_report_preserved": true
+    },
+    {
+      "case": "multiple-aliases",
+      "exit_code": 0,
+      "expected_exit": 0,
+      "references": 4,
+      "missing_libraries": {},
+      "classes": {
+        "implemented": 1,
+        "stub": 0,
+        "absent": 0,
+        "module": 3
+      }
+    }
+  ]
+}

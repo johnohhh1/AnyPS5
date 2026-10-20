@@ -1,0 +1,60 @@
+{
+  "title_id": "PPSA28319",
+  "version": "01.000.000",
+  "audit_baseline": "892a4f1328a14a123eca4af8f3c9ea5d176133ab",
+  "audit_pr": "98596149e2ce227c69ad1e625a1af957e63b1d7d",
+  "relinker_and_libraries": "2626e5ee7e57df6e952a93a997a8b9fc79d80c08",
+  "new_game_run": false,
+  "recorded_game_run": {
+    "seconds": 45.46626379201189,
+    "exit_code": 0,
+    "stop_signals": [
+      "SIGINT"
+    ]
+  },
+  "registries": {
+    "app.Il2CppUserAssemblies.prx.guest.prx.registry.json": "1cd5a5774bb78c9dda49d8f052d32cf860f4d9827d6cbcbdcce2979c2a0f34c1",
+    "app.PS5Util.prx.guest.prx.registry.json": "d476938f6501c34f476a732d760fef1c085932cce2b88bfd6f68961900adc235",
+    "app.lib_burst_generated.prx.guest.prx.registry.json": "3fbbd4c6d76130399b0c79cdf41758669224a91e05b7b216953f0c9728750865",
+    "app.libc.prx.guest.prx.registry.json": "748ccc27ad1a48d4df7f525b6af25c50b275e0ca6f1e0b2b1e72867896510e02",
+    "app.registry.json": "afd7b1c6f34dfcaf89524a22cf964f988129c7784f103a00eeaccde38e4f8f1a"
+  },
+  "results": [
+    {
+      "phase": "main",
+      "exit_code": 1,
+      "seconds": 12.772084025898948,
+      "references": 2355,
+      "unique_imports": 1052,
+      "unique_by_class": {
+        "implemented": 890,
+        "stub": 8,
+        "absent": 4,
+        "module": 150
+      },
+      "missing_libraries": {
+        "Il2cppUserAssemblies.prx": 5
+      },
+      "missing_host_dependencies": [],
+      "source_commit": "98596149e2ce227c69ad1e625a1af957e63b1d7d",
+      "source_dirty": false
+    },
+    {
+      "phase": "pr",
+      "exit_code": 0,
+      "seconds": 12.794199969037436,
+      "references": 2355,
+      "unique_imports": 1052,
+      "unique_by_class": {
+        "implemented": 889,
+        "stub": 8,
+        "absent": 0,
+        "module": 155
+      },
+      "missing_libraries": {},
+      "missing_host_dependencies": [],
+      "source_commit": "98596149e2ce227c69ad1e625a1af957e63b1d7d",
+      "source_dirty": false
+    }
+  ]
+}
