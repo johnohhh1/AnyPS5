@@ -318,6 +318,13 @@ void TestFloatErrors() {
     Require(_Stodx_nid_postfix("0x3", &end, -1, &error) == 0.29999999999999999 && error == 0 && *__error_nid_postfix() == 0, "_Stodx hexadecimal non-power-of-two mantissa with negative scale rounds correctly");
     error = 99;
     *__error_nid_postfix() = 0;
+    const char* largePositive = "0x1p0tail";
+    Require(_Stodx_nid_postfix(largePositive, &end, 30, &error) == 1e30 && end == largePositive + 5 && error == 0 && *__error_nid_postfix() == 0, "_Stodx hexadecimal large positive decimal scale remains decimal");
+    error = 99;
+    *__error_nid_postfix() = 0;
+    Require(_Stodx_nid_postfix("0x1p0", &end, -30, &error) == 1e-30 && error == 0 && *__error_nid_postfix() == 0, "_Stodx hexadecimal large negative decimal scale remains decimal");
+    error = 99;
+    *__error_nid_postfix() = 0;
     Require(_Stofx_nid_postfix("0x1p0", &end, 3, &error) == 1000.0f && error == 0 && *__error_nid_postfix() == 0, "_Stofx hexadecimal scaled by positive pten");
     error = 99;
     *__error_nid_postfix() = 0;
@@ -337,7 +344,7 @@ void TestFloatErrors() {
     error = 99;
     *__error_nid_postfix() = 0;
     const double subnormalRescue = _Stodx_nid_postfix("0x1p-1075", &end, 1, &error);
-    Require(subnormalRescue > 0 && subnormalRescue < 1e-308 && error == 0 && *__error_nid_postfix() == 0, "_Stodx hexadecimal subnormal rescue with positive scale");
+    Require(subnormalRescue == 5 * std::numeric_limits<double>::denorm_min() && error == 0 && *__error_nid_postfix() == 0, "_Stodx hexadecimal subnormal rescue rounds once");
     error = 99;
     *__error_nid_postfix() = 0;
     const double largeDown = _Stodx_nid_postfix("0x1p1023", &end, -400, &error);

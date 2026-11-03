@@ -197,6 +197,90 @@ std::optional<TFloat> UnscaledHexadecimal(const char* text, char** end) {
     return std::copysign(value, negative ? static_cast<TFloat>(-1) : static_cast<TFloat>(1));
 }
 
+void MultiplyDecimal(std::string& digits, unsigned factor, unsigned add = 0) {
+    std::uint64_t carry = add;
+    for (char& digit : digits) {
+        const std::uint64_t product = static_cast<unsigned>(digit - '0') * static_cast<std::uint64_t>(factor) + carry;
+        digit = static_cast<char>('0' + product % 10);
+        carry = product / 10;
+    }
+    while (carry != 0) {
+        digits += static_cast<char>('0' + carry % 10);
+        carry /= 10;
+    }
+}
+
+std::optional<std::string> ScaledHexadecimalText(const char* text, char** end, std::int64_t pten, const char* function) {
+    const char* cursor = text;
+    while (std::isspace(static_cast<unsigned char>(*cursor))) ++cursor;
+    const bool negative = *cursor == '-';
+    if (*cursor == '+' || *cursor == '-') ++cursor;
+    cursor += 2;
+
+    constexpr std::int64_t MaximumDigits = 20000;
+    constexpr std::int64_t MaximumBinaryScale = 20000;
+    std::string digits = "0";
+    std::int64_t fractional = 0;
+    std::int64_t digitCount = 0;
+    bool point = false;
+    bool any = false;
+    for (;;) {
+        const int digit = HexadecimalDigit(*cursor);
+        if (digit < 0) {
+            if (*cursor == '.' && !point) { point = true; ++cursor; continue; }
+            break;
+        }
+        any = true;
+        if (++digitCount > MaximumDigits) NotImplemented_nid_no_patch(function);
+        if (point) ++fractional;
+        if (digits != "0" || digit != 0) MultiplyDecimal(digits, 16, static_cast<unsigned>(digit));
+        ++cursor;
+    }
+    if (!any) return std::nullopt;
+
+    std::int64_t exponent = 0;
+    if (*cursor == 'p' || *cursor == 'P') {
+        const char* first = cursor + 1;
+        const bool minus = *first == '-';
+        if (*first == '+' || *first == '-') ++first;
+        if (std::isdigit(static_cast<unsigned char>(*first))) {
+            do {
+                const int digit = *first++ - '0';
+                exponent = std::min<std::int64_t>(MaximumBinaryScale + 4 * fractional + 1, exponent * 10 + digit);
+            } while (std::isdigit(static_cast<unsigned char>(*first)));
+            if (minus) exponent = -exponent;
+            cursor = first;
+        }
+    }
+    if (end != nullptr) *end = const_cast<char*>(cursor);
+    if (digits == "0") return negative ? "-0" : "0";
+    exponent -= 4 * fractional;
+    if (exponent < -MaximumBinaryScale || exponent > MaximumBinaryScale) NotImplemented_nid_no_patch(function);
+    const std::int64_t decimalExponent = std::clamp<std::int64_t>(pten, -ExponentLimit, ExponentLimit) + std::min<std::int64_t>(exponent, 0);
+    if (exponent > 0) {
+        while (exponent > 0) {
+            const unsigned chunk = static_cast<unsigned>(std::min<std::int64_t>(exponent, 30));
+            MultiplyDecimal(digits, 1u << chunk);
+            exponent -= chunk;
+        }
+    } else {
+        while (exponent < 0) {
+            const unsigned chunk = static_cast<unsigned>(std::min<std::int64_t>(-exponent, 13));
+            unsigned factor = 1;
+            for (unsigned index = 0; index < chunk; ++index) factor *= 5;
+            MultiplyDecimal(digits, factor);
+            exponent += chunk;
+        }
+    }
+    std::string number;
+    number.reserve(digits.size() + 24);
+    if (negative) number += '-';
+    for (auto digit = digits.rbegin(); digit != digits.rend(); ++digit) number += *digit;
+    number += 'e';
+    number += std::to_string(decimalExponent);
+    return number;
+}
+
 template<typename TFloat>
 TFloat ScaledFloat(const char* text, char** end, std::int64_t pten, int* error, TFloat (APS5_VABI *parse)(const char*, char**), const char* function) {
     int& guestErrno = *__error_nid_postfix();
@@ -223,86 +307,9 @@ TFloat ScaledFloat(const char* text, char** end, std::int64_t pten, int* error, 
     const bool overflowed = std::isinf(value) && guestErrno == RangeError;
     if (pten != 0 && (stop != text || Hexadecimal(text)) && (std::isfinite(value) || overflowed)) {
         if (Hexadecimal(text)) {
-            if (true) {
-                const char* cursor = text;
-                while (std::isspace(static_cast<unsigned char>(*cursor))) ++cursor;
-                const bool negative = *cursor == '-';
-                if (*cursor == '+' || *cursor == '-') ++cursor;
-                cursor += 2;
-                std::string hexMantissa;
-                std::int64_t hexFrac = 0;
-                bool hexPoint = false;
-                while (true) {
-                    const int d = HexadecimalDigit(*cursor);
-                    if (d < 0) {
-                        if (*cursor == '.' && !hexPoint) { hexPoint = true; ++cursor; continue; }
-                        break;
-                    }
-                    if (hexPoint) ++hexFrac;
-                    if (!hexMantissa.empty() || d != 0)
-                        hexMantissa += "0123456789abcdef"[d];
-                    ++cursor;
-                }
-                std::int64_t hexExp = 0;
-                if (*cursor == 'p' || *cursor == 'P') {
-                    const char* first = cursor + 1;
-                    const bool minus = *first == '-';
-                    if (*first == '+' || *first == '-') ++first;
-                    if (std::isdigit(static_cast<unsigned char>(*first))) {
-                        do {
-                            hexExp = hexExp > std::numeric_limits<std::int64_t>::max() / 10
-                                ? std::numeric_limits<std::int64_t>::max()
-                                : hexExp * 10 + (*first++ - '0');
-                        } while (std::isdigit(static_cast<unsigned char>(*first)));
-                        if (minus) hexExp = -hexExp;
-                        cursor = first;
-                    }
-                }
-                hexExp -= 4 * hexFrac;
-                if (end != nullptr) *end = const_cast<char*>(cursor);
-                if (!hexMantissa.empty() && value == static_cast<TFloat>(0) && pten > 0) {
-                    guestErrno = 0;
-                    const std::int64_t ptenBin = std::llround(static_cast<long long>(pten) * 3.321928094887362L);
-                    const std::int64_t totalExp = ptenBin + hexExp;
-                    const std::int64_t minExp = static_cast<std::int64_t>(-std::numeric_limits<TFloat>::max_exponent) - static_cast<std::int64_t>(std::numeric_limits<TFloat>::digits) + 1;
-                    value = std::scalbn(static_cast<TFloat>(1), static_cast<int>(std::clamp(totalExp,
-                        minExp,
-                        static_cast<std::int64_t>(std::numeric_limits<TFloat>::max_exponent))));
-                    value = std::copysign(value, negative ? static_cast<TFloat>(-1) : static_cast<TFloat>(1));
-                    if (value == static_cast<TFloat>(0)) {
-                        guestErrno = RangeError;
-                    }
-                } else if (!hexMantissa.empty()) {
-                    std::uint64_t hi = 0, lo = 0;
-                    for (const char c : hexMantissa) {
-                        hi = (hi << 4u) | (lo >> 60u);
-                        lo = (lo << 4u) | static_cast<unsigned>(HexadecimalDigit(c));
-                    }
-                    TFloat mantissa;
-                    if constexpr (std::numeric_limits<TFloat>::digits <= 53) {
-                        mantissa = static_cast<TFloat>(lo);
-                    } else {
-                        const auto top = static_cast<unsigned>(hi >> 56u);
-                        const auto middle = static_cast<unsigned>((hi >> 28u) & 0xfffffffu);
-                        const auto bottom = static_cast<unsigned>(hi & 0xfffffffu);
-                        constexpr TFloat Radix = static_cast<TFloat>(0x1p28L);
-                        mantissa = static_cast<TFloat>(top);
-                        mantissa = mantissa * Radix + static_cast<TFloat>(middle);
-                        mantissa = mantissa * Radix + static_cast<TFloat>(bottom);
-                    }
-                    const int pow10Safe = 30;
-                    if (pten > -pow10Safe && pten < pow10Safe) {
-                        mantissa *= std::pow(static_cast<TFloat>(10), static_cast<TFloat>(pten));
-                        if (hexExp != 0) mantissa = std::scalbn(mantissa, static_cast<int>(hexExp));
-                        value = mantissa;
-                    } else {
-                        const std::int64_t ptenBin = std::llround(static_cast<long long>(pten) * 3.321928094887362L);
-                        const std::int64_t totalExp = ptenBin + hexExp;
-                        value = std::scalbn(mantissa, static_cast<int>(totalExp));
-                    }
-                    value = std::copysign(value, negative ? static_cast<TFloat>(-1) : static_cast<TFloat>(1));
-                    guestErrno = 0;
-                }
+            if (const auto number = ScaledHexadecimalText(text, end, pten, function)) {
+                guestErrno = 0;
+                value = parse(number->c_str(), nullptr);
             }
         } else {
             std::string number(text, static_cast<const char*>(stop));
